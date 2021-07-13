@@ -1,17 +1,21 @@
-#mac stuff
+# mac stuff
 .DS_Store
 
-#eclipse stuff
+# eclipse stuff
 .classpath
 .project
 
-#processing stuff 
+# processing stuff
 generated/
 examples/TMC26XMotorTester/processing/TMC26XMotorTest/application.*/
 examples/TMC26XMotorTester/processing/TMC26XMotorTest/application.*
 
-#eagle stuff
+# eagle stuff
 schematics/*.b#?
 schematics/*.s#?
 
+# build stuff
 *.zip
+
+# vscode stuff
+.vscode/
