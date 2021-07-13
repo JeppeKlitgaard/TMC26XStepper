@@ -90,11 +90,31 @@
 #define STATUS_STAND_STILL 0x80ul
 #define READOUT_VALUE_PATTERN 0xFFC00ul
 
+//definitions for coil turn current
+#define Turn_CoilA1A2 0x00000ul
+#define Turn_CoilA2A1 0x20000ul
+#define Turn_CoilB1B2 0x00000ul
+#define Turn_CoilB2B1 0x00100ul
+
 //default values
 #define INITIAL_MICROSTEPPING 0x3ul //32th microstepping
 
-//debuging output
-//#define DEBUG
+//debugging output
+#define DEBUG
+int Hexnum[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+
+uint8_t currentSPIDataMode;
+
+void setSPIDataMode(uint8_t mode)
+{
+    SPI.setDataMode(mode);
+    currentSPIDataMode = mode;
+}
+
+uint8_t getSPIDataMode()
+{
+    return currentSPIDataMode;
+}
 
 /*
  * Constructor
@@ -115,6 +135,7 @@ TMC26XStepper::TMC26XStepper() {
  */
 void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor)
 {
+    Serial.println("Hello world");
     //we are not started yet
     started = false;
     //by default cool step is not enabled
@@ -131,7 +152,7 @@ void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step
     //initizalize our status values
     this->steps_left = 0;
     this->direction = 0;
-
+    this->spi_steps = 0;
     //initialize register values
     driver_control_register_value = DRIVER_CONTROL_REGISTER | INITIAL_MICROSTEPPING;
     chopper_config_register = CHOPPER_CONFIG_REGISTER;
@@ -143,6 +164,18 @@ void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step
     cool_step_register_value = COOL_STEP_REGISTER;
     stall_guard2_current_register_value = STALL_GUARD2_LOAD_MEASURE_REGISTER;
     driver_configuration_register_value = DRIVER_CONFIG_REGISTER | READ_STALL_GUARD_READING;
+    pinMode(step_pin, OUTPUT);
+    pinMode(dir_pin, OUTPUT);
+    pinMode(cs_pin, OUTPUT);
+    digitalWrite(step_pin, LOW);
+    digitalWrite(dir_pin, LOW);
+    digitalWrite(cs_pin, HIGH);
+    //configure the SPI interface
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setClockDivider(SPI_CLOCK_DIV8);
+    // todo this does not work reliably - find a way to foolprof set it (e.g. while communicating
+    setSPIDataMode(SPI_MODE1);
+    SPI.begin();
 
     //set the current
     setCurrent(current);
@@ -152,43 +185,76 @@ void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step
     setMicrosteps(DEFAULT_MICROSTEPPING_VALUE);
     //save the number of steps
     this->number_of_steps = number_of_steps;
+
+    send262(driver_control_register_value);
+    send262(chopper_config_register);
+    send262(cool_step_register_value);
+    send262(stall_guard2_current_register_value);
+    send262(driver_configuration_register_value);
+    send262(0xE0080ul);
+    send262(0xC001Ful);
+    send262(0xa8202ul);
+    send262(0x901b4ul);
+    started = true;
 }
 
-#ifdef DEBUG
-Serial.println("TMC26X stepper library");
-Serial.print("CS pin: ");
-Serial.println(cs_pin);
-Serial.print("DIR pin: ");
-Serial.println(dir_pin);
-Serial.print("STEP pin: ");
-Serial.println(step_pin);
-Serial.print("current scaling: ");
-Serial.println(current_scaling, DEC);
-#endif
-//set the pins as output & its initial value
-pinMode(step_pin, OUTPUT);
-pinMode(dir_pin, OUTPUT);
-pinMode(cs_pin, OUTPUT);
-digitalWrite(step_pin, LOW);
-digitalWrite(dir_pin, LOW);
-digitalWrite(cs_pin, HIGH);
+void TMC26XStepper::TMC26XSet_SPICS(int cs_pin)
+{
+    this->cs_pin = cs_pin;
+    pinMode(cs_pin, OUTPUT);
+    digitalWrite(cs_pin, HIGH);
+}
 
-//configure the SPI interface
-// SPI.setBitOrder(MSBFIRST);
-// SPI.setClockDivider(SPI_CLOCK_DIV8);
-//todo this does not work reliably - find a way to foolprof set it (e.g. while communicating
-//SPI.setDataMode(SPI_MODE3);
-SPI.begin();
+/*
+ * start & configure the stepper driver
+ * just must be called.
+ */
 
-//set the initial values
-send262(driver_control_register_value);
-send262(chopper_config_register);
-send262(cool_step_register_value);
-send262(stall_guard2_current_register_value);
-send262(driver_configuration_register_value);
+char TMC26XStepper::spi_start()
+{
 
-//save that we are in running mode
-started = true;
+    send262(0xE0080ul);
+    send262(0xC001Ful);
+    send262(0x901b4ul);
+    //unsigned long time = micros();
+    while (this->spi_steps > 0)
+    {
+        unsigned long time = micros();
+        if (time >= this->next_step_time)
+        {
+            coilcnt++;
+            switch (coilcnt)
+            {
+            case 1:
+                send262(Turn_CoilA1A2 | (HexDecimalCurrent << 9));
+                break;
+            case 2:
+                if (this->direction == 1)
+                    send262(Turn_CoilB1B2 | HexDecimalCurrent);
+                else
+                    send262(Turn_CoilB2B1 | HexDecimalCurrent);
+                break;
+            case 3:
+                send262(Turn_CoilA2A1 | HexDecimalCurrent << 9);
+                break;
+            case 4:
+                if (this->direction == 1)
+                    send262(Turn_CoilB2B1 | HexDecimalCurrent);
+                else
+                    send262(Turn_CoilB1B2 | HexDecimalCurrent);
+                break;
+            default:
+                break;
+            }
+
+            //this->last_step_time = time;
+            this->next_step_time = time + this->step_delay;
+            if (coilcnt == 4)
+                coilcnt = 0;
+            this->spi_steps--;
+        }
+    }
+    un_start();
 }
 
 /*
@@ -214,7 +280,21 @@ void TMC26XStepper::setSpeed(unsigned int whatSpeed)
     //update the next step time
     this->next_step_time = this->last_step_time + this->step_delay;
 }
+/*
+  Sets the speed in revs per minute   //SPI MODE
 
+*/
+void TMC26XStepper::SPI_setSpeed(unsigned int whatSpeed)
+{
+    this->speed = whatSpeed;
+    this->step_delay = (60UL * 1000UL * 1000UL) / ((unsigned long)this->number_of_steps * (unsigned long)whatSpeed); // * (unsigned long)this->microsteps);
+#ifdef DEBUG
+    Serial.print("Step delay in micros: ");
+    Serial.println(this->step_delay);
+#endif
+    //update the next step time
+    this->next_step_time = this->last_step_time + this->step_delay;
+}
 unsigned int TMC26XStepper::getSpeed(void)
 {
     return this->speed;
@@ -243,6 +323,32 @@ char TMC26XStepper::step(int steps_to_move)
     }
     else
     {
+        return -1;
+    }
+}
+
+char TMC26XStepper::SPI_step(int spi_steps_to_move)
+{
+    if (this->spi_steps == 0)
+    {
+        this->spi_steps = abs(spi_steps_to_move) + 1; // how many steps to take
+                                                      //this->spi_steps=this->spi_steps+1;
+
+        // determine direction based on whether steps_to_mode is + or -:
+        if (spi_steps_to_move > 0)
+        {
+            this->direction = 1;
+        }
+        else if (spi_steps_to_move < 0)
+        {
+            this->direction = 0;
+        }
+        coilcnt = 0;
+        return 0;
+    }
+    else
+    {
+
         return -1;
     }
 }
@@ -350,6 +456,16 @@ void TMC26XStepper::setCurrent(unsigned int current)
         send262(driver_configuration_register_value);
         send262(stall_guard2_current_register_value);
     }
+}
+
+void TMC26XStepper::SPI_setCoilCurrent(int Current)
+{
+    //char HexDecimalCurrent;
+    if (Current > 248)
+    {
+        Current = 248;
+    }
+    HexDecimalCurrent = Hexnum[Current / 16] << 4 | Hexnum[Current % 16];
 }
 
 unsigned int TMC26XStepper::getCurrent(void)
@@ -1115,7 +1231,7 @@ void TMC26XStepper::debugLastStatus()
     }
 #endif
 }
-
+// unsigned char oldMode;
 /*
  * send register settings to the stepper driver via SPI
  * returns the current status
@@ -1137,11 +1253,16 @@ inline void TMC26XStepper::send262(unsigned long datagram)
 
     // //preserver the previous spi mode
     // unsigned char oldMode = SPCR & SPI_MODE_MASK;
+    // uint8_t oldMode = getSPIDataMode();
+    // // unsigned char oldMode = SPCR & SPI_MODE_MASK;
+    // Serial.print("OldMode: ");
+    // Serial.println(oldMode);
 
     // //if the mode is not correct set it to mode 3
     // if (oldMode != SPI_MODE3)
     // {
-    //     SPI.setDataMode(SPI_MODE3);
+    //     setSPIDataMode(SPI_MODE3);
+    //     oldMode = getSPIDataMode();
     // }
 
     //select the TMC driver
@@ -1175,7 +1296,7 @@ inline void TMC26XStepper::send262(unsigned long datagram)
     // //if the mode is not correct set it to mode 3
     // if (oldMode != SPI_MODE3)
     // {
-    //     SPI.setDataMode(oldMode);
+    //     setSPIDataMode(oldMode);
     // }
 
     SPI.endTransaction();
