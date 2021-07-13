@@ -774,7 +774,7 @@ void TMC26XStepper::setCoolStepConfiguration(unsigned int lower_SG_threshold, un
     }
 }
 
-void TMC26XStepper::setCoolStepEnabled(boolean enabled)
+void TMC26XStepper::setCoolStepEnabled(bool enabled)
 {
     //simply delete the lower limit to disable the cool step
     cool_step_register_value &= ~SE_MIN_PATTERN;
@@ -792,7 +792,7 @@ void TMC26XStepper::setCoolStepEnabled(boolean enabled)
     }
 }
 
-boolean TMC26XStepper::isCoolStepEnabled(void)
+bool TMC26XStepper::isCoolStepEnabled(void)
 {
     return this->cool_step_enabled;
 }
@@ -823,7 +823,7 @@ unsigned char TMC26XStepper::getCoolStepLowerCurrentLimit()
     return (unsigned char)((cool_step_register_value & MINIMUM_CURRENT_FOURTH) >> 15);
 }
 
-void TMC26XStepper::setEnabled(boolean enabled)
+void TMC26XStepper::setEnabled(bool enabled)
 {
     //delete the t_off in the chopper config to get sure
     chopper_config_register &= ~(T_OFF_PATTERN);
@@ -839,7 +839,7 @@ void TMC26XStepper::setEnabled(boolean enabled)
     }
 }
 
-boolean TMC26XStepper::isEnabled()
+bool TMC26XStepper::isEnabled()
 {
     if (chopper_config_register & T_OFF_PATTERN)
     {
@@ -928,7 +928,7 @@ unsigned int TMC26XStepper::getCurrentCurrent(void)
 /*
  return true if the stallguard threshold has been reached
 */
-boolean TMC26XStepper::isStallGuardOverThreshold(void)
+bool TMC26XStepper::isStallGuardOverThreshold(void)
 {
     if (!this->started)
     {
@@ -961,7 +961,7 @@ char TMC26XStepper::getOverTemperature(void)
 }
 
 //is motor channel A shorted to ground
-boolean TMC26XStepper::isShortToGroundA(void)
+bool TMC26XStepper::isShortToGroundA(void)
 {
     if (!this->started)
     {
@@ -971,7 +971,7 @@ boolean TMC26XStepper::isShortToGroundA(void)
 }
 
 //is motor channel B shorted to ground
-boolean TMC26XStepper::isShortToGroundB(void)
+bool TMC26XStepper::isShortToGroundB(void)
 {
     if (!this->started)
     {
@@ -981,7 +981,7 @@ boolean TMC26XStepper::isShortToGroundB(void)
 }
 
 //is motor channel A connected
-boolean TMC26XStepper::isOpenLoadA(void)
+bool TMC26XStepper::isOpenLoadA(void)
 {
     if (!this->started)
     {
@@ -991,7 +991,7 @@ boolean TMC26XStepper::isOpenLoadA(void)
 }
 
 //is motor channel B connected
-boolean TMC26XStepper::isOpenLoadB(void)
+bool TMC26XStepper::isOpenLoadB(void)
 {
     if (!this->started)
     {
@@ -1001,7 +1001,7 @@ boolean TMC26XStepper::isOpenLoadB(void)
 }
 
 //is chopper inactive since 2^20 clock cycles - defaults to ~0,08s
-boolean TMC26XStepper::isStandStill(void)
+bool TMC26XStepper::isStandStill(void)
 {
     if (!this->started)
     {
@@ -1011,7 +1011,7 @@ boolean TMC26XStepper::isStandStill(void)
 }
 
 //is chopper inactive since 2^20 clock cycles - defaults to ~0,08s
-boolean TMC26XStepper::isStallGuardReached(void)
+bool TMC26XStepper::isStallGuardReached(void)
 {
     if (!this->started)
     {
@@ -1032,7 +1032,7 @@ int TMC26XStepper::getResistor()
     return this->resistor;
 }
 
-boolean TMC26XStepper::isCurrentScalingHalfed()
+bool TMC26XStepper::isCurrentScalingHalfed()
 {
     if (this->driver_configuration_register_value & VSENSE)
     {

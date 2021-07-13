@@ -378,13 +378,13 @@ public:
      * \param enabled true if CoolStep should be enabled, false if not.
      * \sa setCoolStepConfiguration()
      */
-     void setCoolStepEnabled(boolean enabled);
+     void setCoolStepEnabled(bool enabled);
 
      /*!
      * \brief check if the CoolStep feature is enabled
      * \sa setCoolStepEnabled()
      */
-     boolean isCoolStepEnabled();
+     bool isCoolStepEnabled();
 
      /*!
      * \brief returns the lower StallGuard threshold for the CoolStep operation
@@ -444,7 +444,7 @@ public:
      *\brief a convenience method to determine if the current scaling uses 0.31V or 0.165V as reference.
      *\return false if 0.13V is the reference voltage, true if 0.165V is used.
      */
-     boolean isCurrentScalingHalfed();
+     bool isCurrentScalingHalfed();
 
      /*!
      * \brief Reads the current current setting value and recalculates the absolute current in mA (1A would be 1000).
@@ -463,7 +463,7 @@ public:
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-     boolean isStallGuardOverThreshold(void);
+     bool isStallGuardOverThreshold(void);
 
      /*!
      * \brief Return over temperature status of the last status readout
@@ -480,7 +480,7 @@ public:
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
 
-     boolean isShortToGroundA(void);
+     bool isShortToGroundA(void);
 
      /*!
      * \brief Is motor channel B shorted to ground detected in the last status readout.
@@ -488,14 +488,14 @@ public:
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-     boolean isShortToGroundB(void);
+     bool isShortToGroundB(void);
      /*!
      * \brief iIs motor channel A connected according to the last statu readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-     boolean isOpenLoadA(void);
+     bool isOpenLoadA(void);
 
      /*!
      * \brief iIs motor channel A connected according to the last statu readout.
@@ -503,7 +503,7 @@ public:
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-     boolean isOpenLoadB(void);
+     bool isOpenLoadB(void);
 
      /*!
      * \brief Is chopper inactive since 2^20 clock cycles - defaults to ~0,08s
@@ -511,7 +511,7 @@ public:
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-     boolean isStandStill(void);
+     bool isStandStill(void);
 
      /*!
      * \brief checks if there is a StallGuard warning in the last status
@@ -524,20 +524,20 @@ public:
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-     boolean isStallGuardReached(void);
+     bool isStallGuardReached(void);
 
      /*!
      *\brief enables or disables the motor driver bridges. If disabled the motor can run freely. If enabled not.
-     *\param enabled a boolean value true if the motor should be enabled, false otherwise.
+     *\param enabled a bool value true if the motor should be enabled, false otherwise.
      */
-     void setEnabled(boolean enabled);
+     void setEnabled(bool enabled);
 
      /*!
      *\brief checks if the output bridges are enabled. If the bridges are not enabled the motor can run freely
      *\return true if the bridges and by that the motor driver are enabled, false if not.
      *\sa setEnabled()
      */
-     boolean isEnabled();
+     bool isEnabled();
 
      /*!
      * \brief Manually read out the status register
@@ -596,11 +596,11 @@ private:
      unsigned char dir_pin;
 
      //status values
-     boolean started;                         //if the stepper has been started yet
+     bool started;                         //if the stepper has been started yet
      int microsteps;                          //the current number of micro steps
      char constant_off_time;                  //we need to remember this value in order to enable and disable the motor
      unsigned char cool_step_lower_threshold; // we need to remember the threshold to enable and disable the CoolStep feature
-     boolean cool_step_enabled;               //we need to remember this to configure the coolstep if it si enabled
+     bool cool_step_enabled;               //we need to remember this to configure the coolstep if it si enabled
 
      //SPI sender
      inline void send262(unsigned long datagram);
