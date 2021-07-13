@@ -111,12 +111,6 @@ public:
      *
      * This is the main constructor. If in doubt use this. You must provide all parameters as described below.
      *
-     * \param number_of_steps the number of steps the motor has per rotation.
-     * \param cs_pin The Arduino pin you have connected the Cient Select Pin (!CS) of the TMC26X for SPI
-     * \param dir_pin the number of the Arduino pin the Direction input of the TMC26X is connected
-     * \param step_pin the number of the Arduino pin the step pin of the TMC26X driver is connected.
-     * \param rms_current the maximum current to privide to the motor in mA (!). A value of 200 would send up to 200mA to the motor
-     * \param resistor the current sense resistor in milli Ohm, defaults to ,15 Ohm ( or 150 milli Ohm) as in the TMC260 Arduino Shield
      *
      * Keep in mind that you must also call TMC26XStepper.start() in order to configure the stepper driver for use.
      *
@@ -127,16 +121,23 @@ public:
      * You can select a different stepping with setMicrosteps() to aa different value.
      * \sa start(), setMicrosteps()
      */
-     TMC26XStepper(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor = 150);
+     TMC26XStepper();
 
      /*!
      * \brief configures and starts the TMC26X stepper driver. Before you called this function the stepper driver is in nonfunctional mode.
+     *
+     * \param number_of_steps the number of steps the motor has per rotation.
+     * \param cs_pin The Arduino pin you have connected the Cient Select Pin (!CS) of the TMC26X for SPI
+     * \param dir_pin the number of the Arduino pin the Direction input of the TMC26X is connected
+     * \param step_pin the number of the Arduino pin the step pin of the TMC26X driver is connected.
+     * \param rms_current the maximum current to privide to the motor in mA (!). A value of 200 would send up to 200mA to the motor
+     * \param resistor the current sense resistor in milliohm, defaults to 0.15 Ohm ( or 150 milli Ohm) as in the TMC260 Arduino Shield
      *
      * This routine configures the TMC26X stepper driver for the given values via SPI.
      * Most member functions are non functional if the driver has not been started.
      * Therefore it is best to call this in your Arduino setup() function.
      */
-     void start();
+     void start(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor = 150);
 
      /*!
      * \brief resets the stepper in unconfigured mode.
@@ -596,11 +597,11 @@ private:
      unsigned char dir_pin;
 
      //status values
-     bool started;                         //if the stepper has been started yet
+     bool started;                            //if the stepper has been started yet
      int microsteps;                          //the current number of micro steps
      char constant_off_time;                  //we need to remember this value in order to enable and disable the motor
      unsigned char cool_step_lower_threshold; // we need to remember the threshold to enable and disable the CoolStep feature
-     bool cool_step_enabled;               //we need to remember this to configure the coolstep if it si enabled
+     bool cool_step_enabled;                  //we need to remember this to configure the coolstep if it si enabled
 
      //SPI sender
      inline void send262(unsigned long datagram);

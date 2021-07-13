@@ -98,12 +98,22 @@
 
 /*
  * Constructor
+
+ * Empty to allow for instantiation outside setup().
+ */
+TMC26XStepper::TMC26XStepper() {
+}
+
+/*
+ * start & configure the stepper driver
+ * just must be called.
+
  * number_of_steps - the steps per rotation
  * cs_pin - the SPI client select pin
  * dir_pin - the pin where the direction pin is connected
  * step_pin - the pin where the step pin is connected
  */
-TMC26XStepper::TMC26XStepper(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor)
+void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor)
 {
     //we are not started yet
     started = false;
@@ -144,48 +154,41 @@ TMC26XStepper::TMC26XStepper(int number_of_steps, int cs_pin, int dir_pin, int s
     this->number_of_steps = number_of_steps;
 }
 
-/*
- * start & configure the stepper driver
- * just must be called.
- */
-void TMC26XStepper::start()
-{
-
 #ifdef DEBUG
-    Serial.println("TMC26X stepper library");
-    Serial.print("CS pin: ");
-    Serial.println(cs_pin);
-    Serial.print("DIR pin: ");
-    Serial.println(dir_pin);
-    Serial.print("STEP pin: ");
-    Serial.println(step_pin);
-    Serial.print("current scaling: ");
-    Serial.println(current_scaling, DEC);
+Serial.println("TMC26X stepper library");
+Serial.print("CS pin: ");
+Serial.println(cs_pin);
+Serial.print("DIR pin: ");
+Serial.println(dir_pin);
+Serial.print("STEP pin: ");
+Serial.println(step_pin);
+Serial.print("current scaling: ");
+Serial.println(current_scaling, DEC);
 #endif
-    //set the pins as output & its initial value
-    pinMode(step_pin, OUTPUT);
-    pinMode(dir_pin, OUTPUT);
-    pinMode(cs_pin, OUTPUT);
-    digitalWrite(step_pin, LOW);
-    digitalWrite(dir_pin, LOW);
-    digitalWrite(cs_pin, HIGH);
+//set the pins as output & its initial value
+pinMode(step_pin, OUTPUT);
+pinMode(dir_pin, OUTPUT);
+pinMode(cs_pin, OUTPUT);
+digitalWrite(step_pin, LOW);
+digitalWrite(dir_pin, LOW);
+digitalWrite(cs_pin, HIGH);
 
-    //configure the SPI interface
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setClockDivider(SPI_CLOCK_DIV8);
-    //todo this does not work reliably - find a way to foolprof set it (e.g. while communicating
-    //SPI.setDataMode(SPI_MODE3);
-    SPI.begin();
+//configure the SPI interface
+// SPI.setBitOrder(MSBFIRST);
+// SPI.setClockDivider(SPI_CLOCK_DIV8);
+//todo this does not work reliably - find a way to foolprof set it (e.g. while communicating
+//SPI.setDataMode(SPI_MODE3);
+SPI.begin();
 
-    //set the initial values
-    send262(driver_control_register_value);
-    send262(chopper_config_register);
-    send262(cool_step_register_value);
-    send262(stall_guard2_current_register_value);
-    send262(driver_configuration_register_value);
+//set the initial values
+send262(driver_control_register_value);
+send262(chopper_config_register);
+send262(cool_step_register_value);
+send262(stall_guard2_current_register_value);
+send262(driver_configuration_register_value);
 
-    //save that we are in running mode
-    started = true;
+//save that we are in running mode
+started = true;
 }
 
 /*
