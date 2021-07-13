@@ -103,19 +103,6 @@
 #define DEBUG
 int Hexnum[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
 
-uint8_t currentSPIDataMode;
-
-void setSPIDataMode(uint8_t mode)
-{
-    SPI.setDataMode(mode);
-    currentSPIDataMode = mode;
-}
-
-uint8_t getSPIDataMode()
-{
-    return currentSPIDataMode;
-}
-
 /*
  * Constructor
 
@@ -136,9 +123,9 @@ TMC26XStepper::TMC26XStepper()
  */
 void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor)
 {
-    Serial.println("Hello world");
     //we are not started yet
     started = false;
+
     //by default cool step is not enabled
     cool_step_enabled = false;
 
@@ -154,6 +141,7 @@ void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step
     this->steps_left = 0;
     this->direction = 0;
     this->spi_steps = 0;
+
     //initialize register values
     driver_control_register_value = DRIVER_CONTROL_REGISTER | INITIAL_MICROSTEPPING;
     chopper_config_register = CHOPPER_CONFIG_REGISTER;
@@ -171,11 +159,7 @@ void TMC26XStepper::start(int number_of_steps, int cs_pin, int dir_pin, int step
     digitalWrite(step_pin, LOW);
     digitalWrite(dir_pin, LOW);
     digitalWrite(cs_pin, HIGH);
-    //configure the SPI interface
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setClockDivider(SPI_CLOCK_DIV8);
-    // todo this does not work reliably - find a way to foolprof set it (e.g. while communicating
-    setSPIDataMode(SPI_MODE1);
+
     SPI.begin();
 
     //set the current
@@ -217,7 +201,9 @@ char TMC26XStepper::spi_start()
     send262(0xE0080ul);
     send262(0xC001Ful);
     send262(0x901b4ul);
+
     //unsigned long time = micros();
+
     while (this->spi_steps > 0)
     {
         unsigned long time = micros();
@@ -1252,25 +1238,8 @@ inline void TMC26XStepper::send262(unsigned long datagram)
 
     unsigned long i_datagram;
 
-    // //preserver the previous spi mode
-    // unsigned char oldMode = SPCR & SPI_MODE_MASK;
-    // uint8_t oldMode = getSPIDataMode();
-    // // unsigned char oldMode = SPCR & SPI_MODE_MASK;
-    // Serial.print("OldMode: ");
-    // Serial.println(oldMode);
-
-    // //if the mode is not correct set it to mode 3
-    // if (oldMode != SPI_MODE3)
-    // {
-    //     setSPIDataMode(SPI_MODE3);
-    //     oldMode = getSPIDataMode();
-    // }
-
     //select the TMC driver
     digitalWrite(cs_pin, LOW);
-
-    //ensure that only valid bist are set (0-19)
-    //datagram &=REGISTER_BIT_PATTERN;
 
 #ifdef DEBUG
     Serial.print("Sending ");
@@ -1292,13 +1261,6 @@ inline void TMC26XStepper::send262(unsigned long datagram)
 #endif
     //deselect the TMC chip
     digitalWrite(cs_pin, HIGH);
-
-    // //restore the previous SPI mode if neccessary
-    // //if the mode is not correct set it to mode 3
-    // if (oldMode != SPI_MODE3)
-    // {
-    //     setSPIDataMode(oldMode);
-    // }
 
     SPI.endTransaction();
 
