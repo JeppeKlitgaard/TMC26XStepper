@@ -396,7 +396,7 @@ char TMC26XStepper::getStallGuardThreshold(void)
     //convert the value to an int to correctly handle the negative numbers
     char result = stall_guard_threshold;
     //check if it is negative and fill it up with leading 1 for proper negative number representation
-    if (result & _BV(6))
+    if (result & bit(6))
     {
         result |= 0xC0;
     }
@@ -1119,16 +1119,27 @@ void TMC26XStepper::debugLastStatus()
  */
 inline void TMC26XStepper::send262(unsigned long datagram)
 {
+    /*
+    Library initially made for 16 Mhz AVR boards
+    It initially used SPI.setClockDivider(8), thus using a 2 MHz clock speed
+    for SPI.
+
+    Thus we choose: maxSpeed = 2000000
+    */
+    const unsigned int maxSpeed = 2000000;
+    const SPISettings settings262 = SPISettings(maxSpeed, MSBFIRST, SPI_MODE3);
+    SPI.beginTransaction(settings262);
+
     unsigned long i_datagram;
 
-    //preserver the previous spi mode
-    unsigned char oldMode = SPCR & SPI_MODE_MASK;
+    // //preserver the previous spi mode
+    // unsigned char oldMode = SPCR & SPI_MODE_MASK;
 
-    //if the mode is not correct set it to mode 3
-    if (oldMode != SPI_MODE3)
-    {
-        SPI.setDataMode(SPI_MODE3);
-    }
+    // //if the mode is not correct set it to mode 3
+    // if (oldMode != SPI_MODE3)
+    // {
+    //     SPI.setDataMode(SPI_MODE3);
+    // }
 
     //select the TMC driver
     digitalWrite(cs_pin, LOW);
@@ -1157,12 +1168,14 @@ inline void TMC26XStepper::send262(unsigned long datagram)
     //deselect the TMC chip
     digitalWrite(cs_pin, HIGH);
 
-    //restore the previous SPI mode if neccessary
-    //if the mode is not correct set it to mode 3
-    if (oldMode != SPI_MODE3)
-    {
-        SPI.setDataMode(oldMode);
-    }
+    // //restore the previous SPI mode if neccessary
+    // //if the mode is not correct set it to mode 3
+    // if (oldMode != SPI_MODE3)
+    // {
+    //     SPI.setDataMode(oldMode);
+    // }
+
+    SPI.endTransaction();
 
     //store the datagram as status result
     driver_status_result = i_datagram;

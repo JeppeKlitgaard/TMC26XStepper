@@ -25,15 +25,14 @@
 
  */
 
-
 // ensure this library description is only included once
 #ifndef TMC26XStepper_h
 #define TMC26XStepper_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include <Arduino.h>
+#include <Arduino.h>
 #else
-	#include <WProgram.h>
+#include <WProgram.h>
 #endif
 
 //! return value for TMC26XStepper.getOverTemperature() if there is a overtemperature situation in the TMC chip
@@ -104,9 +103,10 @@
  *
  * You can check with isMoving() if the mototr is still moving or stop it  apruptely with stop().
  */
-class TMC26XStepper {
-  public:
-    /*!
+class TMC26XStepper
+{
+public:
+     /*!
      * \brief creates a new represenatation of a stepper motor connected to a TMC26X stepper driver
      *
      * This is the main constructor. If in doubt use this. You must provide all parameters as described below.
@@ -127,18 +127,18 @@ class TMC26XStepper {
      * You can select a different stepping with setMicrosteps() to aa different value.
      * \sa start(), setMicrosteps()
      */
-	TMC26XStepper(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor=150);
+     TMC26XStepper(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor = 150);
 
-    /*!
+     /*!
      * \brief configures and starts the TMC26X stepper driver. Before you called this function the stepper driver is in nonfunctional mode.
      *
      * This routine configures the TMC26X stepper driver for the given values via SPI.
      * Most member functions are non functional if the driver has not been started.
      * Therefore it is best to call this in your Arduino setup() function.
      */
-	void start();
+     void start();
 
-    /*!
+     /*!
      * \brief resets the stepper in unconfigured mode.
      *
      * This routine enables you to call start again. It does not change anything
@@ -148,22 +148,21 @@ class TMC26XStepper {
      * this has to be configured back by yourself.
      * (Hint: Normally you do not need this function)
      */
-	void un_start();
+     void un_start();
 
-
-    /*!
+     /*!
      * \brief Sets the rotation speed in revolutions per minute.
      * \param whatSpeed the desired speed in rotations per minute.
      */
-    void setSpeed(unsigned int whatSpeed);
+     void setSpeed(unsigned int whatSpeed);
 
-    /*!
+     /*!
      * \brief reads out the currently selected speed in revolutions per minute.
      * \sa setSpeed()
      */
-    unsigned int getSpeed(void);
+     unsigned int getSpeed(void);
 
-    /*!
+     /*!
      * \brief Set the number of microsteps in 2^i values (rounded) up to 256
      *
      * This method set's the number of microsteps per step in 2^i interval.
@@ -171,9 +170,9 @@ class TMC26XStepper {
      * If you give any other value it will be rounded to the next smaller number (3 would give a microstepping of 2).
      * You can always check the current microstepping with getMicrosteps().
      */
-	void setMicrosteps(int number_of_steps);
+     void setMicrosteps(int number_of_steps);
 
-	/*!
+     /*!
      * \brief returns the effective current number of microsteps selected.
      *
      * This function always returns the effective number of microsteps.
@@ -181,9 +180,9 @@ class TMC26XStepper {
      *
      * \sa setMicrosteps()
      */
-	int getMicrosteps(void);
+     int getMicrosteps(void);
 
-    /*!
+     /*!
      * \brief Initiate a movement for the given number of steps. Positive numbers move in one, negative numbers in the other direction.
      *
      * \param number_of_steps The number of steps to move the motor.
@@ -198,9 +197,9 @@ class TMC26XStepper {
      * You can always verify with isMoving() or even use stop() to stop the motor before giving it new step directions.
      * \sa isMoving(), getStepsLeft(), stop()
      */
-    char step(int number_of_steps);
+     char step(int number_of_steps);
 
-    /*!
+     /*!
      * \brief Central movement method, must be called as often as possible in the lopp function and is very fast.
      *
      * This routine checks if the motor still has to move, if the waiting delay has passed to send a new step command to the motor
@@ -218,32 +217,32 @@ class TMC26XStepper {
      * from an timer overflow interrupt to ensure proper calling.
      * \sa step()
      */
-    char move(void);
+     char move(void);
 
-    /*!
+     /*!
      * \brief checks if the motor still has to move to fulfill the last movement command.
      * \return 0 if the motor stops, -1 if the motor is moving.
      *
      * This method can be used to determine if the motor is ready for new movements.
      *\sa step(), move()
      */
-    char isMoving(void);
+     char isMoving(void);
 
-    /*!
+     /*!
      * \brief Get the number of steps left in the current movement.
      * \return The number of steps left in the movement. This number is always positive.
      */
-    unsigned int getStepsLeft(void);
+     unsigned int getStepsLeft(void);
 
-    /*!
+     /*!
      * \brief Stops the motor regardless if it moves or not.
      * \return -1 if the motor was moving and is really stoped or 0 if it was not moving at all.
      *
      * This method directly and apruptely stops the motor and may be used as an emergency stop.
      */
-    char stop(void);
+     char stop(void);
 
-    /*!
+     /*!
      * \brief Sets and configure the classical Constant Off Timer Chopper
      * \param constant_off_time The off time setting controls the minimum chopper frequency. For most applications an off time within the range of 5μs to 20μs will fit. Setting this parameter to zero completely disables all driver transistors and the motor can free-wheel. 0: chopper off, 1:15: off time setting (1 will work with minimum blank time of 24 clocks)
      * \param blank_time Selects the comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. For most low current drivers, a setting of 1 or 2 is good. For high current applications with large MOSFETs, a setting of 2 or 3 will be required. 0 (min setting) … (3) amx setting
@@ -267,9 +266,9 @@ class TMC26XStepper {
      * \sa setSpreadCycleChoper() for other alternatives.
      * \sa setRandomOffTime() for spreading the noise over a wider spectrum
      */
-	void setConstantOffTimeChopper(char constant_off_time, char blank_time, char fast_decay_time_setting, char sine_wave_offset, unsigned char use_current_comparator);
+     void setConstantOffTimeChopper(char constant_off_time, char blank_time, char fast_decay_time_setting, char sine_wave_offset, unsigned char use_current_comparator);
 
-    /*!
+     /*!
      * \brief Sets and configures with spread cycle chopper.
      * \param constant_off_time The off time setting controls the minimum chopper frequency. For most applications an off time within the range of 5μs to 20μs will fit. Setting this parameter to zero completely disables all driver transistors and the motor can free-wheel. 0: chopper off, 1:15: off time setting (1 will work with minimum blank time of 24 clocks)
      * \param blank_time Selects the comparator blank time. This time needs to safely cover the switching event and the duration of the ringing on the sense resistor. For most low current drivers, a setting of 1 or 2 is good. For high current applications with large MOSFETs, a setting of 2 or 3 will be required. 0 (min setting) … (3) amx setting
@@ -289,9 +288,9 @@ class TMC26XStepper {
      *
      * \sa setRandomOffTime() for spreading the noise over a wider spectrum
      */
-	void setSpreadCycleChopper(char constant_off_time, char blank_time, char hysteresis_start, char hysteresis_end, char hysteresis_decrement);
+     void setSpreadCycleChopper(char constant_off_time, char blank_time, char hysteresis_start, char hysteresis_end, char hysteresis_decrement);
 
-	/*!
+     /*!
      * \brief Use random off time for noise reduction (0 for off, -1 for on).
      * \param value 0 for off, -1 for on
      *
@@ -306,26 +305,26 @@ class TMC26XStepper {
      * It modulates the slow decay time setting when switched on. The random off time feature further spreads the chopper spectrum,
      * reducing electromagnetic emission on single frequencies.
      */
-	void setRandomOffTime(char value);
+     void setRandomOffTime(char value);
 
-	/*!
+     /*!
      * \brief set the maximum motor current in mA (1000 is 1 Amp)
      * Keep in mind this is the maximum peak Current. The RMS current will be 1/sqrt(2) smaller. The actual current can also be smaller
      * by employing CoolStep.
      * \param current the maximum motor current in mA
      * \sa getCurrent(), getCurrentCurrent()
      */
-	void setCurrent(unsigned int current);
+     void setCurrent(unsigned int current);
 
-    /*!
+     /*!
      * \brief readout the motor maximum current in mA (1000 is an Amp)
      * This is the maximum current. to get the current current - which may be affected by CoolStep us getCurrentCurrent()
      *\return the maximum motor current in milli amps
      * \sa getCurrentCurrent()
      */
-    unsigned int getCurrent(void);
+     unsigned int getCurrent(void);
 
-	/*!
+     /*!
      * \brief set the StallGuard threshold in order to get sensible StallGuard readings.
      * \param stall_guard_threshold -64 … 63 the StallGuard threshold
      * \param stall_guard_filter_enabled 0 if the filter is disabled, -1 if it is enabled
@@ -340,21 +339,21 @@ class TMC26XStepper {
      *
      * \sa getCurrentStallGuardReading() to read out the current value.
      */
-	void setStallGuardThreshold(char stall_guard_threshold, char stall_guard_filter_enabled);
+     void setStallGuardThreshold(char stall_guard_threshold, char stall_guard_filter_enabled);
 
-    /*!
+     /*!
      * \brief reads out the StallGuard threshold
      * \return a number between -64 and 63.
      */
-    char getStallGuardThreshold(void);
+     char getStallGuardThreshold(void);
 
-    /*!
+     /*!
      * \brief returns the current setting of the StallGuard filter
      * \return 0 if not set, -1 if set
      */
-    char getStallGuardFilter(void);
+     char getStallGuardFilter(void);
 
-    /*!
+     /*!
      * \brief This method configures the CoolStep smart energy operation. You must have a proper StallGuard configuration for the motor situation (current, voltage, speed) in rder to use this feature.
      * \param lower_SG_threshold Sets the lower threshold for stallGuard2TM reading. Below this value, the motor current becomes increased. Allowed values are 0...480
      * \param SG_hysteresis Sets the distance between the lower and the upper threshold for stallGuard2TM reading. Above the upper threshold (which is lower_SG_threshold+SG_hysteresis+1) the motor current becomes decreased. Allowed values are 0...480
@@ -371,94 +370,92 @@ class TMC26XStepper {
      * (1/2 or 1/4th otf the configured current).
      * \sa COOL_STEP_HALF_CS_LIMIT, COOL_STEP_QUARTER_CS_LIMIT
      */
-    void setCoolStepConfiguration(unsigned int lower_SG_threshold, unsigned int SG_hysteresis, unsigned char current_decrement_step_size,
-                                  unsigned char current_increment_step_size, unsigned char lower_current_limit);
+     void setCoolStepConfiguration(unsigned int lower_SG_threshold, unsigned int SG_hysteresis, unsigned char current_decrement_step_size,
+                                   unsigned char current_increment_step_size, unsigned char lower_current_limit);
 
-    /*!
+     /*!
      * \brief enables or disables the CoolStep smart energy operation feature. It must be configured before enabling it.
      * \param enabled true if CoolStep should be enabled, false if not.
      * \sa setCoolStepConfiguration()
      */
-    void setCoolStepEnabled(boolean enabled);
+     void setCoolStepEnabled(boolean enabled);
 
-
-    /*!
+     /*!
      * \brief check if the CoolStep feature is enabled
      * \sa setCoolStepEnabled()
      */
-    boolean isCoolStepEnabled();
+     boolean isCoolStepEnabled();
 
-    /*!
+     /*!
      * \brief returns the lower StallGuard threshold for the CoolStep operation
      * \sa setCoolStepConfiguration()
      */
-    unsigned int getCoolStepLowerSgThreshold();
+     unsigned int getCoolStepLowerSgThreshold();
 
-    /*!
+     /*!
      * \brief returns the upper StallGuard threshold for the CoolStep operation
      * \sa setCoolStepConfiguration()
      */
-    unsigned int getCoolStepUpperSgThreshold();
+     unsigned int getCoolStepUpperSgThreshold();
 
-    /*!
+     /*!
      * \brief returns the number of StallGuard readings befor CoolStep adjusts the motor current.
      * \sa setCoolStepConfiguration()
      */
-    unsigned char getCoolStepNumberOfSGReadings();
+     unsigned char getCoolStepNumberOfSGReadings();
 
-    /*!
+     /*!
      * \brief returns the increment steps for the current for the CoolStep operation
      * \sa setCoolStepConfiguration()
      */
-    unsigned char getCoolStepCurrentIncrementSize();
+     unsigned char getCoolStepCurrentIncrementSize();
 
-    /*!
+     /*!
      * \brief returns the absolut minium current for the CoolStep operation
      * \sa setCoolStepConfiguration()
      * \sa COOL_STEP_HALF_CS_LIMIT, COOL_STEP_QUARTER_CS_LIMIT
      */
-    unsigned char getCoolStepLowerCurrentLimit();
+     unsigned char getCoolStepLowerCurrentLimit();
 
-	/*!
+     /*!
      * \brief Get the current microstep position for phase A
      * \return The current microstep position for phase A 0…255
      *
      * Keep in mind that this routine reads and writes a value via SPI - so this may take a bit time.
      */
-	int getMotorPosition(void);
+     int getMotorPosition(void);
 
-    /*!
+     /*!
      * \brief Reads the current StallGuard value.
      * \return The current StallGuard value, lesser values indicate higher load, 0 means stall detected.
      * Keep in mind that this routine reads and writes a value via SPI - so this may take a bit time.
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-	int getCurrentStallGuardReading(void);
+     int getCurrentStallGuardReading(void);
 
-    /*!
+     /*!
      * \brief Reads the current current setting value as fraction of the maximum current
      * Returns values between 0 and 31, representing 1/32 to 32/32 (=1)
      * \sa setCoolStepConfiguration()
      */
-    unsigned char getCurrentCSReading(void);
+     unsigned char getCurrentCSReading(void);
 
-
-    /*!
+     /*!
      *\brief a convenience method to determine if the current scaling uses 0.31V or 0.165V as reference.
      *\return false if 0.13V is the reference voltage, true if 0.165V is used.
      */
-    boolean isCurrentScalingHalfed();
+     boolean isCurrentScalingHalfed();
 
-    /*!
+     /*!
      * \brief Reads the current current setting value and recalculates the absolute current in mA (1A would be 1000).
      * This method calculates the currently used current setting (either by setting or by CoolStep) and reconstructs
      * the current in mA by usinge the VSENSE and resistor value. This method uses floating point math - so it
      * may not be the fastest.
      * \sa getCurrentCSReading(), getResistor(), isCurrentScalingHalfed(), getCurrent()
      */
-    unsigned int getCurrentCurrent(void);
+     unsigned int getCurrentCurrent(void);
 
-    /*!
+     /*!
      * \brief checks if there is a StallGuard warning in the last status
      * \return 0 if there was no warning, -1 if there was some warning.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
@@ -466,57 +463,57 @@ class TMC26XStepper {
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-	boolean isStallGuardOverThreshold(void);
+     boolean isStallGuardOverThreshold(void);
 
-    /*!
+     /*!
      * \brief Return over temperature status of the last status readout
      * return 0 is everything is OK, TMC26X_OVERTEMPERATURE_PREWARING if status is reached, TMC26X_OVERTEMPERATURE_SHUTDOWN is the chip is shutdown, -1 if the status is unknown.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-	char getOverTemperature(void);
+     char getOverTemperature(void);
 
-    /*!
+     /*!
      * \brief Is motor channel A shorted to ground detected in the last status readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
 
-	boolean isShortToGroundA(void);
+     boolean isShortToGroundA(void);
 
-    /*!
+     /*!
      * \brief Is motor channel B shorted to ground detected in the last status readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-	boolean isShortToGroundB(void);
-	/*!
+     boolean isShortToGroundB(void);
+     /*!
      * \brief iIs motor channel A connected according to the last statu readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-	boolean isOpenLoadA(void);
+     boolean isOpenLoadA(void);
 
-	/*!
+     /*!
      * \brief iIs motor channel A connected according to the last statu readout.
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-	boolean isOpenLoadB(void);
+     boolean isOpenLoadB(void);
 
-    /*!
+     /*!
      * \brief Is chopper inactive since 2^20 clock cycles - defaults to ~0,08s
      * \return true is yes, false if not.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
      * You may want to use getMotorPosition() or getCurrentStallGuardReading() to enforce an updated status readout.
      */
-	boolean isStandStill(void);
+     boolean isStandStill(void);
 
-    /*!
+     /*!
      * \brief checks if there is a StallGuard warning in the last status
      * \return 0 if there was no warning, -1 if there was some warning.
      * Keep in mind that this method does not enforce a readout but uses the value of the last status readout.
@@ -527,22 +524,22 @@ class TMC26XStepper {
      *
      * \sa setStallGuardThreshold() for tuning the readout to sensible ranges.
      */
-	boolean isStallGuardReached(void);
+     boolean isStallGuardReached(void);
 
-    /*!
+     /*!
      *\brief enables or disables the motor driver bridges. If disabled the motor can run freely. If enabled not.
      *\param enabled a boolean value true if the motor should be enabled, false otherwise.
      */
-    void setEnabled(boolean enabled);
+     void setEnabled(boolean enabled);
 
-    /*!
+     /*!
      *\brief checks if the output bridges are enabled. If the bridges are not enabled the motor can run freely
      *\return true if the bridges and by that the motor driver are enabled, false if not.
      *\sa setEnabled()
      */
-    boolean isEnabled();
+     boolean isEnabled();
 
-	/*!
+     /*!
      * \brief Manually read out the status register
      * This function sends a byte to the motor driver in order to get the current readout. The parameter read_value
      * seletcs which value will get returned. If the read_vlaue changes in respect to the previous readout this method
@@ -551,63 +548,62 @@ class TMC26XStepper {
      * \param read_value selects which value to read out (0..3). You can use the defines TMC26X_READOUT_POSITION, TMC_262_READOUT_STALLGUARD, or TMC_262_READOUT_CURRENT
      * \sa TMC26X_READOUT_POSITION, TMC_262_READOUT_STALLGUARD, TMC_262_READOUT_CURRENT
      */
-	void readStatus(char read_value);
+     void readStatus(char read_value);
 
-    /*!
+     /*!
      * \brief Returns the current sense resistor value in milliohm.
      * The default value of ,15 Ohm will return 150.
      */
-    int getResistor();
+     int getResistor();
 
-    /*!
+     /*!
      * \brief Prints out all the information that can be found in the last status read out - it does not force a status readout.
      * The result is printed via Serial
      */
-	void debugLastStatus(void);
-	/*!
+     void debugLastStatus(void);
+     /*!
      * \brief library version
      * \return the version number as int.
      */
-    int version(void);
+     int version(void);
 
-  private:
-  	unsigned int steps_left;		//the steps the motor has to do to complete the movement
-    int direction;        // Direction of rotation
-    unsigned long step_delay;    // delay between steps, in ms, based on speed
-    int number_of_steps;      // total number of steps this motor can take
-    unsigned int speed; // we need to store the current speed in order to change the speed after changing microstepping
-    unsigned int resistor; //current sense resitor value in milliohm
+private:
+     unsigned int steps_left;  //the steps the motor has to do to complete the movement
+     int direction;            // Direction of rotation
+     unsigned long step_delay; // delay between steps, in ms, based on speed
+     int number_of_steps;      // total number of steps this motor can take
+     unsigned int speed;       // we need to store the current speed in order to change the speed after changing microstepping
+     unsigned int resistor;    //current sense resitor value in milliohm
 
-    unsigned long last_step_time;      // time stamp in ms of when the last step was taken
-    unsigned long next_step_time;      // time stamp in ms of when the last step was taken
+     unsigned long last_step_time; // time stamp in ms of when the last step was taken
+     unsigned long next_step_time; // time stamp in ms of when the last step was taken
 
-	//driver control register copies to easily set & modify the registers
-	unsigned long driver_control_register_value;
-	unsigned long chopper_config_register;
-	unsigned long cool_step_register_value;
-	unsigned long stall_guard2_current_register_value;
-	unsigned long driver_configuration_register_value;
-	//the driver status result
-	unsigned long driver_status_result;
+     //driver control register copies to easily set & modify the registers
+     unsigned long driver_control_register_value;
+     unsigned long chopper_config_register;
+     unsigned long cool_step_register_value;
+     unsigned long stall_guard2_current_register_value;
+     unsigned long driver_configuration_register_value;
+     //the driver status result
+     unsigned long driver_status_result;
 
-	//helper routione to get the top 10 bit of the readout
-	inline int getReadoutValue();
+     //helper routione to get the top 10 bit of the readout
+     inline int getReadoutValue();
 
-	//the pins for the stepper driver
-	unsigned char cs_pin;
-	unsigned char step_pin;
-	unsigned char dir_pin;
+     //the pins for the stepper driver
+     unsigned char cs_pin;
+     unsigned char step_pin;
+     unsigned char dir_pin;
 
-	//status values
-	boolean started; //if the stepper has been started yet
-	int microsteps; //the current number of micro steps
-    char constant_off_time; //we need to remember this value in order to enable and disable the motor
-    unsigned char cool_step_lower_threshold; // we need to remember the threshold to enable and disable the CoolStep feature
-    boolean cool_step_enabled; //we need to remember this to configure the coolstep if it si enabled
+     //status values
+     boolean started;                         //if the stepper has been started yet
+     int microsteps;                          //the current number of micro steps
+     char constant_off_time;                  //we need to remember this value in order to enable and disable the motor
+     unsigned char cool_step_lower_threshold; // we need to remember the threshold to enable and disable the CoolStep feature
+     boolean cool_step_enabled;               //we need to remember this to configure the coolstep if it si enabled
 
-	//SPI sender
-	inline void send262(unsigned long datagram);
+     //SPI sender
+     inline void send262(unsigned long datagram);
 };
 
 #endif
-
