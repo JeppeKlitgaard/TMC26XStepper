@@ -121,7 +121,8 @@ uint8_t getSPIDataMode()
 
  * Empty to allow for instantiation outside setup().
  */
-TMC26XStepper::TMC26XStepper() {
+TMC26XStepper::TMC26XStepper()
+{
 }
 
 /*
