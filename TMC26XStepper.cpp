@@ -520,7 +520,7 @@ void TMC26XStepper::setConstantOffTimeChopper(char constant_off_time, char blank
 	}
 	//if started we directly send it to the motor
 	if (started) {
-		send262(driver_control_register_value);
+		send262(chopper_config_register);
 	}	
 }
 
@@ -600,7 +600,7 @@ void TMC26XStepper::setSpreadCycleChopper(char constant_off_time, char blank_tim
 	chopper_config_register |= ((unsigned long)blank_value) << BLANK_TIMING_SHIFT;
 	//if started we directly send it to the motor
 	if (started) {
-		send262(driver_control_register_value);
+		send262(chopper_config_register);
 	}	
 }
 
@@ -624,7 +624,7 @@ void TMC26XStepper::setRandomOffTime(char value) {
 	}
 	//if started we directly send it to the motor
 	if (started) {
-		send262(driver_control_register_value);
+		send262(chopper_config_register);
 	}	
 }	
 
